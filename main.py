@@ -19,6 +19,7 @@ print("✅ Open Edge")
 blablalink.open()
 blablalink.signIn()
 blablalink.mission()
+blablalink.viewAllMissions()
 print("✅ Blablalink")
 # Open new tab
 pag.hotkey("ctrl", "t")
