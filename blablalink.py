@@ -15,6 +15,9 @@ sticker_tab_img = "./img/blablalink/sticker-tab.png"
 sticker_img = "./img/blablalink/sticker.png"
 send_btn_img = "./img/blablalink/send-btn.png"
 close_post_img = "./img/blablalink/close-post.png"
+outpost_img = "./img/blablalink/outpost.png"
+quest_img = "./img/blablalink/quest.png"
+
 
 def open():
     # Blablalink
@@ -23,12 +26,19 @@ def open():
     pag.press("enter")
 
     # Wait for fully loaded
+    wait_time = 0
     while True:
         try:
             pag.locateOnScreen(filter_img, confidence = 0.9)
             break
         except pag.ImageNotFoundException:
             time.sleep(1)
+
+            # Reload page after 5s not loadding
+            wait_time += 1
+            if wait_time == 5:
+                pag.hotkey("ctrl", "f5")
+                wait_time = 0
 
 def signIn():
     wait_time = 0
@@ -116,3 +126,14 @@ def mission():
 
         except pag.ImageNotFoundException:
             pag.scroll(-150)
+
+def viewAllMissions():
+    # Go to OUTPOST tab
+    outpost_location = pag.locateOnScreen(outpost_img, confidence = 0.9)
+    pag.moveTo(outpost_location, duration = 0.2)
+    pag.leftClick()
+
+    # Open PERKS QUEST
+    quest_location = pag.locateOnScreen(quest_img, confidence = 0.9)
+    pag.moveTo(quest_location, duration = 0.2)
+    pag.leftClick()
