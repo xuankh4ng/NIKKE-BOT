@@ -19,6 +19,7 @@ def open():
     pag.press("enter")
 
     # Wait for fully loaded
+    wait_time = 0
     while True:
         try:
             discord_icon_location = pag.locateOnScreen(discord_icon_img, confidence = 0.9)
@@ -26,6 +27,12 @@ def open():
             break
         except pag.ImageNotFoundException:
             time.sleep(1)
+            
+            # Reload page after 5s not loadding
+            wait_time += 1
+            if wait_time == 5:
+                pag.hotkey("ctrl", "f5")
+                wait_time = 0
 
 def nikkeServer():
     # Finding NIKKE Server
