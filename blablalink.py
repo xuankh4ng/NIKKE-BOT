@@ -21,24 +21,17 @@ quest_img = "./img/blablalink/quest.png"
 
 def open():
     # Blablalink
-    pag.hotkey("ctrl", "l")
-    pag.write("https://www.blablalink.com")
+    pag.press("win")
+    pag.write("Blablalink", interval = 0.1)
     pag.press("enter")
 
     # Wait for fully loaded
-    wait_time = 0
     while True:
         try:
             pag.locateOnScreen(filter_img, confidence = 0.9)
             break
         except pag.ImageNotFoundException:
             time.sleep(1)
-
-            # Reload page after 5s not loadding
-            wait_time += 1
-            if wait_time == 5:
-                pag.hotkey("ctrl", "f5")
-                wait_time = 0
 
 def signIn():
     wait_time = 0
@@ -91,7 +84,7 @@ def mission():
                 pag.leftClick()
 
             # Comment
-            if comment == 0:
+            if comment != 1:
                 # Open comment box
                 comment_box_location = pag.locateOnScreen(comment_box_img, confidence = 0.9)
                 pag.moveTo(comment_box_location, duration = 0.2)
