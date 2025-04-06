@@ -67,6 +67,7 @@ while user_input:
         user_confirm = input("❗ Are you sure? (y/n) |> ")
 
         if user_confirm == "y":
+            print("--------------------")
             for x in range(5, 0, -1):
                 print(f"🟨 Closing app in {x}")
                 time.sleep(1)
