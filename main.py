@@ -49,9 +49,7 @@ while user_input:
         blablalink.viewAllMissions()
         print("✅ Blablalink")
 
-        pag.keyDown("alt")
-        pag.press("tab")
-        pag.keyUp("alt")
+        pag.hotkey("alt", "tab")
 
         time.sleep(1)
         print("")
@@ -65,9 +63,7 @@ while user_input:
         discord.checkingCDKey()
         print("✅ Discord")
 
-        pag.keyDown("alt")
-        pag.press("tab")
-        pag.keyUp("alt")
+        pag.hotkey("alt", "tab")
 
         time.sleep(1)
         print("")
