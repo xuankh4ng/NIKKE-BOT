@@ -2,80 +2,95 @@ import pyautogui as pag
 import time
 
 # Image Path
-micro_icon_img = "./img/discord/micro-icon.png"
-explore_img = "./img/discord/explore.png"
+inbox_icon_img = "./img/discord/inbox-icon.png"
 nikke_server_img = "./img/discord/nikke-server.png"
+main_channel_img = "./img/discord/main-channel.png"
 sign_in_event_img = "./img/discord/sign-in-event.png"
-sign_in_event_active_img = "./img/discord/sign-in-event-active.png"
-voice_channel_img = "./img/discord/voice-channel.png"
 sign_in_btn_img = "./img/discord/sign-in-btn.png"
 sign_in_log_img = "./img/discord/sign-in-log.png"
 cd_key_img = "./img/discord/cd-key.png"
 
+# Each pyautogui function will take 0.5s delay to excuse (for stability)
 pag.PAUSE = 0.5
 
 def open():
-    # Discord
+    # Open through Windows Search
     pag.press("win")
     pag.write("Discord", interval = 0.1)
     pag.press("enter")
 
     # Wait for fully loaded
     while True:
+        # If find 'inbox-icon' === app fully loaded -> Break the loop
         try:
-            micro_icon_location = pag.locateOnScreen(micro_icon_img, confidence = 0.9)
-            pag.moveTo(micro_icon_location, duration = 0.2)
-            pag.moveRel(-160, -400, duration = 0.2)
+            pag.locateOnScreen(inbox_icon_img, confidence = 0.9)
             break
+        # If not, sleep the script for 1s then repeat the loop
         except pag.ImageNotFoundException:
-            time.sleep(1)
+            time.sleep(0.5)
 
+# In Discord, we can navigate through server by keyboard shortcut: 'Ctrl' + 'Alt' + 'Down_Arrow || Up_Arrow'
 def nikkeServer():
-    # Finding NIKKE Server
-    scroll_value = -150
-    explore = 0
+    # Hold both 'Ctrl' and 'Alt' keys
+    pag.keyDown("ctrl")
+    pag.keyDown("alt")
+
+    # Finding NIKKE SERVER by the name
     while True:
+        # If find it, break the loop
         try:
-            nikke_server_location = pag.locateOnScreen(nikke_server_img, confidence = 0.9)
-            pag.moveTo(nikke_server_location, duration = 0.2)
-            pag.leftClick()
+            pag.locateOnScreen(nikke_server_img, confidence = 0.9)
             break
+        # If not, keep press 'Down_Arrow' key to find
         except pag.ImageNotFoundException:
-            pag.scroll(scroll_value)
-            if explore == 0:
-                try:
-                    explore_location = pag.locateOnScreen(explore_img, confidence = 0.9)
-                    scroll_value *= -1
-                    explore = 1
-                except pag.ImageNotFoundException:
-                    pass
+            pag.press("down")
+            time.sleep(1) # Delay for the server load
+            
+    # Release both 'Ctrl' and 'Alt' keys
+    pag.keyUp("ctrl")
+    pag.keyUp("alt")
 
+
+# Navigate channel by using keyboard shortcut: 'Alt' + 'Down_Arrow'
 def signInEvent():
-    # Move to channel list
-    micro_icon_location = pag.locateOnScreen(micro_icon_img, confidence = 0.9)
-    pag.moveTo(micro_icon_location, duration = 0.2)
-    pag.moveRel(0, -150, duration = 0.2)
+    # Hold 'Alt' key 
+    pag.keyDown("alt")
 
-    # Fiding 'sign-in-event' channel
-    scroll = -150
-    visited = 0
-
+    # Finding 'sign-in-event' channel by looking for 'sign-in-event' image
+    key = "down"
+    finding_main_channel = False
+    steps = 0
     while True:
+        # If find it, move inside 'sign-in-event' channel
         try:
             sign_in_event_location = pag.locateOnScreen(sign_in_event_img, confidence = 0.9)
             pag.moveTo(sign_in_event_location, duration = 0.2)
-            pag.leftClick()
+            pag.moveRel(0, 100, duration = 0.2)
             break
+        # If not, keep pressing 'Down_Arrow' key 10 times
         except pag.ImageNotFoundException:
-            pag.scroll(scroll)
+            pag.press(key)
+            time.sleep(0.5) # Delay for the channel load
+            
+            # Fiding 'main' channel (to know that we pass by 'sign-in-event' channel)
+            if finding_main_channel == False:
+                while True:
+                    # If find it, find upward
+                    try:
+                        pag.locateOnScreen(main_channel_img, confidence = 0.9)
+                        key = "up"
+                        finding_main_channel = True
+                        break
+                    # If not, keep find for 10 more times then find upward
+                    except pag.ImageNotFoundException:
+                        steps += 1 # Update each step to press 'Down_Arrow' key
+                        if steps == 10:
+                            key = "up"
+                            finding_main_channel = True
+                        break
 
-            if visited == 0:
-                try:
-                    pag.locateOnScreen(voice_channel_img, confidence = 0.9)    
-                    scroll *= -1
-                    visited = 1
-                except pag.ImageNotFoundException:
-                    pass
+    # Release 'Alt' key 
+    pag.keyUp("alt")
 
     # Sign In
     while True:
@@ -85,27 +100,29 @@ def signInEvent():
             pag.leftClick()
             break
         except pag.ImageNotFoundException:
-            time.sleep(1)
+            pag.scroll(-150)
 
-    # Wait for fully loaded
+    # Wait for the message appear after click the 'Sign In' Button
     while True:
         try:
             pag.locateOnScreen(sign_in_log_img, confidence = 0.9)
             break
+        # If not, delay for 1s
         except pag.ImageNotFoundException:
             time.sleep(1)
 
 def checkingCDKey():
-    # Move to channel list
-    sign_in_event_active_location = pag.locateOnScreen(sign_in_event_active_img, confidence = 0.9)
-    pag.moveTo(sign_in_event_active_location, duration = 0.2)
+    # Hold 'Alt' key 
+    pag.keyDown("alt")
 
-    # Finding CD-Key Channel
+    # Finding 'cd-key' channel
     while True:
         try:
-            cd_key_location = pag.locateOnScreen(cd_key_img, confidence = 0.9)
-            pag.moveTo(cd_key_location, duration = 0.2)
-            pag.leftClick()
+            pag.locateOnScreen(cd_key_img, confidence = 0.9)
             break
         except pag.ImageNotFoundException:
-            pag.scroll(-150)
+            pag.press("down")
+            time.sleep(0.5)
+
+    # Release 'Alt' key 
+    pag.keyUp("alt")

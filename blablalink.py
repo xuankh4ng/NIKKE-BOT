@@ -40,10 +40,15 @@ def signIn():
             sign_in_btn_location = pag.locateOnScreen(sign_in_btn_img, confidence = 0.9)
             pag.moveTo(sign_in_btn_location, duration = 0.2)
             pag.leftClick()
-
-            close_sign_in_location = pag.locateOnScreen(close_sign_in_img, confidence = 0.9)
-            pag.moveTo(close_sign_in_location, duration = 0.2)
-            pag.leftClick()
+            
+            while True:
+                try:
+                    close_sign_in_location = pag.locateOnScreen(close_sign_in_img, confidence = 0.9)
+                    pag.moveTo(close_sign_in_location, duration = 0.2)
+                    pag.leftClick()
+                    break
+                except pag.ImageNotFoundException:
+                    time.sleep(1)
             break
         except pag.ImageNotFoundException:
             wait_time += 1
@@ -85,28 +90,32 @@ def mission():
 
             # Comment
             if comment != 1:
-                # Open comment box
-                comment_box_location = pag.locateOnScreen(comment_box_img, confidence = 0.9)
-                pag.moveTo(comment_box_location, duration = 0.2)
-                pag.leftClick()
+                while True:
+                    try:
+                        # Open comment box
+                        comment_box_location = pag.locateOnScreen(comment_box_img, confidence = 0.9)
+                        pag.moveTo(comment_box_location, duration = 0.2)
+                        pag.leftClick()
 
-                # Go to sticker tab
-                sticker_tab_location = pag.locateOnScreen(sticker_tab_img, confidence = 0.9)
-                pag.moveTo(sticker_tab_location, duration = 0.2)
-                pag.leftClick()
+                        # Go to sticker tab
+                        sticker_tab_location = pag.locateOnScreen(sticker_tab_img, confidence = 0.9)
+                        pag.moveTo(sticker_tab_location, duration = 0.2)
+                        pag.leftClick()
 
-                # Pick a sticker
-                sticker_location = pag.locateOnScreen(sticker_img, confidence = 0.9)
-                pag.moveTo(sticker_location, duration = 0.2)
-                pag.leftClick()
+                        # Pick a sticker
+                        sticker_location = pag.locateOnScreen(sticker_img, confidence = 0.9)
+                        pag.moveTo(sticker_location, duration = 0.2)
+                        pag.leftClick()
 
-                # Send comment
-                send_btn_location = pag.locateOnScreen(send_btn_img, confidence = 0.9)
-                pag.moveTo(send_btn_location, duration = 0.2)
-                pag.leftClick()
+                        # Send comment
+                        send_btn_location = pag.locateOnScreen(send_btn_img, confidence = 0.9)
+                        pag.moveTo(send_btn_location, duration = 0.2)
+                        pag.leftClick()
 
-                # Update "comment"
-                comment = 1
+                        comment = 1 # Update "comment"
+                        break
+                    except pag.ImageNotFoundException:
+                        time.sleep(1)
             
             # Complete 5 like ==> Break the loop
             if like >= 5 and comment == 1:
@@ -127,6 +136,11 @@ def viewAllMissions():
     pag.leftClick()
 
     # Open PERKS QUEST
-    quest_location = pag.locateOnScreen(quest_img, confidence = 0.9)
-    pag.moveTo(quest_location, duration = 0.2)
-    pag.leftClick()
+    while True:
+        try:
+            quest_location = pag.locateOnScreen(quest_img, confidence = 0.9)
+            pag.moveTo(quest_location, duration = 0.2)
+            pag.leftClick()
+            break
+        except pag.ImageNotFoundException:
+            time.sleep(1)
