@@ -1,8 +1,16 @@
 import pyautogui as pag
 import blablalink, discord
 import time
+import tkinter as tk
+from tkinter import messagebox
 
 pag.PAUSE = 0.5
+
+def show_notification():
+    root = tk.Tk()
+    root.withdraw()  # Hide the main window
+    messagebox.showinfo("Notification", "✅ The command has completed. You may continue.")
+    root.destroy()
 
 user_input = input("❓ Blablalink or Discord or All or Exit? (b/d/a/e) |> ")
 
@@ -19,7 +27,6 @@ while user_input:
             blablalink.mission()
             blablalink.viewAllMissions()
             print("✅ Blablalink")
-            print("")
 
             # Discord
             time.sleep(1)
@@ -28,17 +35,11 @@ while user_input:
             discord.signInEvent()
             discord.checkingCDKey()
             print("✅ Discord")
-
-            pag.keyDown("alt")
-            pag.press("tab")
-            pag.press("tab")
-            pag.keyUp("alt")
-
-            time.sleep(1)
-            print("")
+            print("--------------------")
+            show_notification()
         elif user_confirm == "n":
             time.sleep(1)
-            print("")
+            print("--------------------")
 
     elif user_input == "b":
         # Blablalink
@@ -48,11 +49,8 @@ while user_input:
         blablalink.mission()
         blablalink.viewAllMissions()
         print("✅ Blablalink")
-
-        pag.hotkey("alt", "tab")
-
-        time.sleep(1)
-        print("")
+        print("--------------------")
+        show_notification()
 
     elif user_input == "d":
         # Discord
@@ -62,11 +60,8 @@ while user_input:
         discord.signInEvent()
         discord.checkingCDKey()
         print("✅ Discord")
-
-        pag.hotkey("alt", "tab")
-
-        time.sleep(1)
-        print("")
+        print("--------------------")
+        show_notification()
 
     elif user_input == "e":
         user_confirm = input("❗ Are you sure? (y/n) |> ")
@@ -80,12 +75,12 @@ while user_input:
 
         elif user_confirm == "n":
             time.sleep(1)
-            print("")
+            print("--------------------")
 
     else:
         print("❌ Wrong Input. Please try again!")
         time.sleep(1)
-        print("")
+        print("--------------------")
 
     # Update user input
     user_input = input("❓ Blablalink or Discord or All or Exit? (b/d/a/e) |> ")

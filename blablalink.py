@@ -54,7 +54,6 @@ def signIn():
             wait_time += 1
             time.sleep(1)
             if wait_time == 3:
-                print("Already did!")
                 break
 
 def mission():
