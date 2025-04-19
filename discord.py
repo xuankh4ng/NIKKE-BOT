@@ -1,128 +1,218 @@
 import pyautogui as pag
 import time
+from rich.console import Console
+from rich.panel import Panel
+console = Console()
 
-# Image Path
-inbox_icon_img = "./img/discord/inbox-icon.png"
-nikke_server_img = "./img/discord/nikke-server.png"
-main_channel_img = "./img/discord/main-channel.png"
-sign_in_event_img = "./img/discord/sign-in-event.png"
-sign_in_btn_img = "./img/discord/sign-in-btn.png"
-sign_in_log_img = "./img/discord/sign-in-log.png"
-cd_key_img = "./img/discord/cd-key.png"
+# Đường dẫn hình ảnh
+inboxIcon_img = "./img/discord/inbox-icon.png"
+nikkeServer_img = "./img/discord/nikke-server.png"
+startPoint_img = "./img/discord/start-point.png"
+endPoint_img = "./img/discord/end-point.png"
+signInChannel_img = "./img/discord/sign-in-channel.png"
+signInButton_img = "./img/discord/sign-in-btn.png"
+signInLog_img = "./img/discord/sign-in-log.png"
+cdKeyChannel_img = "./img/discord/cd-key.png"
 
-# Each pyautogui function will take 0.5s delay to excuse (for stability)
+# Delay 0.5s cho mỗi lần làm xong 1 'pyautogui'  
 pag.PAUSE = 0.5
 
-def open():
-    # Open through Windows Search
-    pag.press("win")
-    pag.write("Discord", interval = 0.1)
-    pag.press("enter")
+# Mở Discord
+def open(website):
+    with console.status("[bold bright_magenta]Opening Discord..."):
+        # Mở thông ô tìm kiếm trên Windows
+        pag.press("win")
 
-    # Wait for fully loaded
-    while True:
-        # If find 'inbox-icon' === app fully loaded -> Break the loop
-        try:
-            pag.locateOnScreen(inbox_icon_img, confidence = 0.9)
-            break
-        # If not, sleep the script for 1s then repeat the loop
-        except pag.ImageNotFoundException:
-            time.sleep(0.5)
+        # Web hoặc App?
+        if website == False:
+            pag.write("Discord", interval = 0.1)
+        else:
+            pag.write("https://discord.com/channels/@me", interval = 0.1)
+            
+        # Nhấn 'Enter'
+        pag.press("enter")
 
-# In Discord, we can navigate through server by keyboard shortcut: 'Ctrl' + 'Alt' + 'Down_Arrow || Up_Arrow'
-def nikkeServer():
-    # Hold both 'Ctrl' and 'Alt' keys
+        # Đợi cho Discord load thông qua icon
+        while True:
+            # Nếu tìm thấy ==> Thoát khỏi vòng lặp
+            try:
+                pag.locateOnScreen(inboxIcon_img, confidence = 0.9)
+                console.print("[bold bright_green]✅ Opened and loaded [bright_magenta]Discord")
+                break
+            # Nếu không, tạm ngừng cho đến khi tìm thấy
+            except pag.ImageNotFoundException:
+                time.sleep(0.5)
+
+# Di chuyển qua các Server
+def navigateToServer(name, img_path):
+    # Đè 2 phím 'Ctrl' và 'Alt'
     pag.keyDown("ctrl")
     pag.keyDown("alt")
 
-    # Finding NIKKE SERVER by the name
+    # Tìm bằng tên Server thông qua hình ảnh
     while True:
-        # If find it, break the loop
-        try:
-            pag.locateOnScreen(nikke_server_img, confidence = 0.9)
-            break
-        # If not, keep press 'Down_Arrow' key to find
-        except pag.ImageNotFoundException:
-            pag.press("down")
-            time.sleep(1) # Delay for the server load
+        with console.status(f"[bold bright_magenta]Finding {name} Server..."):
+            # Nếu tìm được ==> Thoát khỏi vòng lặp
+            try:
+                pag.locateOnScreen(img_path, confidence = 0.9)
+                console.print(f"[bold bright_green]✅ Entered [bright_magenta]{name} Server")
+                break
+            # Nếu không, cứ tiếp tục nhấn phím 'Mũi tên Xuống'
+            except pag.ImageNotFoundException:
+                pag.press("down")
+                # Delay cho server load
+                time.sleep(1)
             
-    # Release both 'Ctrl' and 'Alt' keys
+    # Thả 2 phím 'Ctrl' và 'Alt'
     pag.keyUp("ctrl")
     pag.keyUp("alt")
 
-
-# Navigate channel by using keyboard shortcut: 'Alt' + 'Down_Arrow'
-def signInEvent():
-    # Hold 'Alt' key 
+# Di chuyển qua các Channel
+def navigateToChannel(name, target_img_path, startPoint_img_path, endPoint_img_path):
+    # Đè phím 'Alt' 
     pag.keyDown("alt")
 
-    # Finding 'sign-in-event' channel by looking for 'sign-in-event' image
+    # Các biến với giá trị mặc định
     key = "down"
-    finding_main_channel = False
-    steps = 0
-    while True:
-        # If find it, move inside 'sign-in-event' channel
-        try:
-            sign_in_event_location = pag.locateOnScreen(sign_in_event_img, confidence = 0.9)
-            pag.moveTo(sign_in_event_location, duration = 0.2)
-            pag.moveRel(0, 100, duration = 0.2)
-            break
-        # If not, keep pressing 'Down_Arrow' key 10 times
-        except pag.ImageNotFoundException:
-            pag.press(key)
-            time.sleep(0.5) # Delay for the channel load
-            
-            # Fiding 'main' channel (to know that we pass by 'sign-in-event' channel)
-            if finding_main_channel == False:
-                while True:
-                    # If find it, find upward
-                    try:
-                        pag.locateOnScreen(main_channel_img, confidence = 0.9)
-                        key = "up"
-                        finding_main_channel = True
-                        break
-                    # If not, keep find for 10 more times then find upward
-                    except pag.ImageNotFoundException:
-                        steps += 1 # Update each step to press 'Down_Arrow' key
-                        if steps == 10:
-                            key = "up"
-                            finding_main_channel = True
-                        break
+    downCounter = 0
+    findStartPoint = False
+    findEndPoint = False
 
-    # Release 'Alt' key 
+    # Tìm 'target' channel thông qua tên của channel đó
+    while True:
+        with console.status(f"[bold bright_magenta]Finding {name} channel..."):
+            # Nếu tìm thấy ==> Thoát khỏi vòng lặp
+            try:
+                pag.locateOnScreen(target_img_path, confidence=0.9)
+                console.print(f"[bold bright_green]✅ Navigated to [bright_magenta]{name} channel")
+                break
+            # Nếu không thì
+            except pag.ImageNotFoundException:
+                # Tìm theo hướng dựa vào 'key'
+                pag.press(key)
+                time.sleep(0.5)
+
+                # Trường hợp nằm dưới 'target'
+                if findEndPoint == False:
+                    # Nếu tìm được
+                    try:
+                        pag.locateOnScreen(endPoint_img_path, confidence=0.9)
+                        console.print(f"[bright_black]❗ The {name} channel is located at the top")
+
+                        # Cập nhật là đã tìm thấy 'endPoint' và đổi hướng tìm
+                        findEndPoint = True
+                        key = "up"
+
+                    # Nếu không thì
+                    except pag.ImageNotFoundException:
+                        # Cập nhật số lần tìm 'downCounter'
+                        downCounter += 1
+                        # Cập nhật hướng tìm (để đảm bảo luôn là hướng xuống)
+                        key = "down"
+
+                        # Nếu tìm tới lần thứ 5 mà không thấy 'endPoint'
+                        if downCounter == 5:
+                            console.print(f"[bright_black]❗ The {name} channel is located at the top")
+                            # Cập nhật là đã tìm thấy 'endPoint' (mặc dù không phải) và đổi hướng tìm
+                            findEndPoint = True
+
+                # Trường hợp nằm trên 'target' (chỉ khi đã tìm thấy 'endPoint')
+                if findStartPoint == False and findEndPoint == True:
+                    # Nếu tìm được
+                    try:
+                        pag.locateOnScreen(startPoint_img_path, confidence=0.9)
+                        console.print(f"[bright_black]❗ The {name} channel is located at the bottom")
+
+                        # Cập nhật là đã tìm thấy 'startPoint' và đổi hướng tìm
+                        findStartPoint = True
+                        key = "down"
+
+                    # Nếu không thì
+                    except pag.ImageNotFoundException:
+                        # Cập nhật hướng tìm (để đảm bảo luôn là hướng lên)
+                        key = "up"
+
+    # Thả phím 'Alt' 
     pag.keyUp("alt")
 
-    # Sign In
-    while True:
-        try:
-            sign_in_btn_location = pag.locateOnScreen(sign_in_btn_img, confidence = 0.9)
-            pag.moveTo(sign_in_btn_location, duration = 0.2)
-            pag.leftClick()
-            break
-        except pag.ImageNotFoundException:
-            pag.scroll(-150)
+# Đăng nhập sự kiện
+def signInEvent():
+    findChannelName = False
 
-    # Wait for the message appear after click the 'Sign In' Button
+    # Tìm nút 'Sign In'
     while True:
-        try:
-            pag.locateOnScreen(sign_in_log_img, confidence = 0.9)
-            break
-        # If not, delay for 1s
-        except pag.ImageNotFoundException:
-            time.sleep(1)
+        with console.status("[bold bright_magenta]Siging In..."):
+            # Nếu tìm thấy ==> Nhấn nút và Thoát khỏi vòng lặp
+            try:
+                signInButton_location = pag.locateOnScreen(signInButton_img, confidence=0.9)
+                pag.moveTo(signInButton_location, duration=0.2)
+                pag.leftClick()
+                break
 
-def checkingCDKey():
-    # Hold 'Alt' key 
+            # Nếu không thì
+            except pag.ImageNotFoundException:
+                # Đưa con trỏ chuột vào trong vùng có thể cuộn xuống được
+                signInChannel_location = pag.locateOnScreen(signInChannel_img, confidence=0.9)
+                if findChannelName == False:
+                    pag.moveTo(signInChannel_location, duration=0.2)
+                    pag.moveRel(0, 50, duration=0.2)
+                    findChannelName = True
+
+                # Cuộn xuống cho đến khi tìm thấy
+                pag.scroll(-150)  
+
+    # Đợi kết quả đăng nhập xuất hiện
+    while True:
+        with console.status("[bold bright_magenta]Confirming..."):
+            # Nếu tìm thấy ==> Thoát khỏi vòng lặp
+            try:
+                pag.locateOnScreen(signInLog_img, confidence=0.9)
+                console.print("[bold bright_green]✅ [bright_magenta]Sign In[/bright_magenta] completed")
+                break
+
+            # Nếu không thì
+            except pag.ImageNotFoundException:
+                # Cuộn xuống cho đến khi tìm thấy
+                pag.scroll(-150)  
+            
+
+def checkingCDKeys():
+    # Đè phím 'Alt' 
     pag.keyDown("alt")
 
-    # Finding 'cd-key' channel
+    # Tìm 'cd-keys' channel
     while True:
-        try:
-            pag.locateOnScreen(cd_key_img, confidence = 0.9)
-            break
-        except pag.ImageNotFoundException:
-            pag.press("down")
-            time.sleep(0.5)
+        with console.status("[bold bright_magenta]Finding cd-keys channel..."):
+            # Nếu tìm thấy ==> Thoát khỏi vòng lặp
+            try:
+                pag.locateOnScreen(cdKeyChannel_img, confidence = 0.9)
+                console.print("[bold bright_green]✅ Navigated to [bright_magenta]cd-keys channel")
+                break
 
-    # Release 'Alt' key 
+            # Nếu không, cứ tiếp tục nhấn phím 'Mũi tên Xuống'
+            except pag.ImageNotFoundException:
+                pag.press("down")
+                # Delay cho channel load
+                time.sleep(0.5)
+
+    # Thả phím 'Alt' 
     pag.keyUp("alt")
+
+def tasks(web):
+    console.print("[bold bright_white]--------------------")
+    console.print(Panel.fit("[bold bright_magenta]Discord"))
+    open(web)
+    navigateToServer("NIKKE", nikkeServer_img)
+    navigateToChannel("sign-in-event", signInChannel_img, startPoint_img, endPoint_img)
+    signInEvent()
+    checkingCDKeys()
+    console.print("[bold bright_white][Result][/bold bright_white]")
+    console.print("[bold bright_green]✅ Completed [bright_magenta]Discord")
+    console.print("[bold bright_white]--------------------")
+
+if __name__ == "__main__":
+    open(True)
+    navigateToServer("NIKKE", nikkeServer_img)
+    navigateToChannel("sign-in-event", signInChannel_img, startPoint_img, endPoint_img)
+    signInEvent()
+    checkingCDKeys()

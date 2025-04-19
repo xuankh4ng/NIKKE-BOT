@@ -3,85 +3,154 @@ import blablalink, discord
 import time
 import tkinter as tk
 from tkinter import messagebox
+from rich.panel import Panel
+from rich.console import Console
 
 pag.PAUSE = 0.5
+console = Console()
+
+def styleText(mess, fontStyle, color):
+    return f"[{fontStyle} {color}]{mess}[/{fontStyle} {color}]"
 
 def show_notification():
     root = tk.Tk()
     root.withdraw()  # Hide the main window
-    messagebox.showinfo("Notification", "✅ The command has completed. You may continue.")
+    messagebox.showinfo("Notification", "The command has completed. You may continue in your Terminal!")
     root.destroy()
 
-user_input = input("❓ Blablalink or Discord or All or Exit? (b/d/a/e) |> ")
+message = [
+    # "? Blablalink or Discord or All? (b/d/a) |> " 
+    styleText("❓ ", "bold", "bright_red") + 
+    styleText("Blablalink ", "bold", "bright_cyan") + "or " + 
+    styleText("Discord ", "bold", "bright_magenta") + "or " + 
+    styleText("All ", "bold", "bright_green") + "? (" + 
+    styleText("b", "bold", "bright_cyan") + "/" + 
+    styleText("d", "bold", "bright_magenta") + "/" + 
+    styleText("a", "bold", "bright_green") + ") |> ",
+    # "! Are you sure? (y/n) |> "
+    styleText("❗ Are you sure? (", "bold", "bright_red") + 
+    styleText("y", "bold", "bright_green") +    
+    styleText("/", "bold", "bright_red") + 
+    styleText("n", "bold", "bright_yellow") +    
+    styleText(") |> ", "bold", "bright_red"),
+    # "? App or Web version? |> "
+    styleText("❓ ", "bold", "bright_red") +
+    styleText("App ", "bold", "bright_cyan") + 
+    styleText("or ", "bold", "bright_red") +
+    styleText("Web ", "bold", "bright_yellow") +    
+    styleText("version? (", "bold", "bright_red") +
+    styleText("a", "bold", "bright_cyan") + 
+    styleText("/", "bold", "bright_red") +
+    styleText("w", "bold", "bright_yellow") +    
+    styleText(") |> ", "bold", "bright_red"),
+]
 
-while user_input:
-    if user_input == "a":
-        user_confirm = input("❗ Are you sure? (y/n) |> ")
+def main():
+    console.print(Panel.fit("[bold bright_yellow]NIKKE BOT"))
+    console.print("[bold bright_white][Choices][/bold bright_white]")
+    user_input = console.input(message[0])
 
-        if user_confirm == "y":
-            print("✅ Confirm All")
-            # Blablalink
-            time.sleep(1)
-            blablalink.open()
-            blablalink.signIn()
-            blablalink.mission()
-            blablalink.viewAllMissions()
-            print("✅ Blablalink")
+    while user_input:
+        # Both Blablalink and Discord
+        if user_input == "a":
+            # "! Are you sure? (y/n) |> "
+            user_confirm = console.input(message[1])
 
-            # Discord
-            time.sleep(1)
-            discord.open()
-            discord.nikkeServer()
-            discord.signInEvent()
-            discord.checkingCDKey()
-            print("✅ Discord")
-            print("--------------------")
-            show_notification()
-        elif user_confirm == "n":
-            time.sleep(1)
-            print("--------------------")
+            if user_confirm == "y":
+                console.print("[bold bright_white]--------------------")
+                console.print("[bold bright_white]🆗 Confirm [bright_green]All")
 
-    elif user_input == "b":
+                # "? App or Web version? (a/w) |> "
+                web_input = console.input(message[2])
+
+                if web_input == "w":
+                    console.print("[bold bright_white]🆗 Confirm [bright_yellow]Web version")
+                    time.sleep(0.5)
+                    blablalink.tasks(True)
+                    discord.tasks(True)
+                else:
+                    console.print("[bold bright_white]🆗 Confirm [bright_cyan]App version")
+                    time.sleep(0.5)
+                    blablalink.tasks(False)
+                    discord.tasks(False)
+
+                show_notification()
+            elif user_confirm == "n":
+                time.sleep(0.5)
+                console.print("[bold bright_white]--------------------")
+            else:
+                console.print(styleText("❌ Wrong Input. Please try again!", "bold", "bright_red"))
+                time.sleep(0.5)
+                console.print("[bold bright_white]--------------------")
+
         # Blablalink
-        time.sleep(1)
-        blablalink.open()
-        blablalink.signIn()
-        blablalink.mission()
-        blablalink.viewAllMissions()
-        print("✅ Blablalink")
-        print("--------------------")
-        show_notification()
+        elif user_input == "b":
+            # "! Are you sure? (y/n) |> "
+            user_confirm = console.input(message[1])
+            
+            if user_confirm == "y":
+                console.print("[bold bright_white]--------------------")
+                console.print("[bold bright_white]🆗 Confirm [bright_cyan]Blablalink")
 
-    elif user_input == "d":
+                # "? App or Web version? (a/w) |> "
+                web_input = console.input(message[2])
+                
+                if web_input == "w":
+                    console.print("[bold bright_white]🆗 Confirm [bright_yellow]Web version")
+                    time.sleep(0.5)
+                    blablalink.tasks(True)
+                else:
+                    console.print("[bold bright_white]🆗 Confirm [bright_cyan]App version")
+                    time.sleep(0.5)
+                    blablalink.tasks(False)
+
+                show_notification()
+            elif user_confirm == "n":
+                time.sleep(0.5)
+                console.print("[bold bright_white]--------------------")
+            else:
+                console.print(styleText("❌ Wrong Input. Please try again!", "bold", "bright_red"))
+                time.sleep(0.5)
+                console.print("[bold bright_white]--------------------")
+
         # Discord
-        time.sleep(1)
-        discord.open()
-        discord.nikkeServer()
-        discord.signInEvent()
-        discord.checkingCDKey()
-        print("✅ Discord")
-        print("--------------------")
-        show_notification()
+        elif user_input == "d":
+            # "! Are you sure? (y/n) |> "
+            user_confirm = console.input(message[1])
 
-    elif user_input == "e":
-        user_confirm = input("❗ Are you sure? (y/n) |> ")
+            if user_confirm == "y":
+                console.print("[bold bright_white]--------------------")
+                console.print("[bold bright_white]🆗 Confirm [bright_magenta]Discord")
 
-        if user_confirm == "y":
-            print("--------------------")
-            for x in range(5, 0, -1):
-                print(f"🟨 Closing app in {x}")
-                time.sleep(1)
-                if x == 1:
-                    pag.hotkey("alt", "f4")
+                # "? App or Web version? (a/w) |> "
+                web_input = console.input(message[2])
 
-        elif user_confirm == "n":
-            time.sleep(1)
-            print("--------------------")
+                if web_input == "w":
+                    console.print("[bold bright_white]🆗 Confirm [bright_yellow]Web version")
+                    time.sleep(0.5)
+                    discord.tasks(True)
+                else:
+                    console.print("[bold bright_white]🆗 Confirm [bright_cyan]App version")
+                    time.sleep(0.5)
+                    discord.tasks(False)
+                
+                show_notification()
+            elif user_confirm == "n":
+                time.sleep(0.5)
+                console.print("[bold bright_white]--------------------")
+            else:
+                console.print(styleText("❌ Wrong Input. Please try again!", "bold", "bright_red"))
+                time.sleep(0.5)
+                console.print("[bold bright_white]--------------------")
 
-    else:
-        print("❌ Wrong Input. Please try again!")
-        time.sleep(1)
-        print("--------------------")
+        else:
+            console.print(styleText("❌ Wrong Input. Please try again!", "bold", "bright_red"))
+            time.sleep(0.5)
+            console.print("[bold bright_white]--------------------")
 
-    # Update user input
-    user_input = input("❓ Blablalink or Discord or All or Exit? (b/d/a/e) |> ")
+        # Update user input
+        console.print("[bold bright_white][Choices][/bold bright_white]")
+        user_input = console.input(message[0])
+
+if __name__ == "__main__":
+    main()
